@@ -3,6 +3,7 @@ from __future__ import print_function
 
 from hanabi_learning_environment import rl_env
 from hanabi_learning_environment.agents.simple_agent import SimpleAgent
+from hanabi_learning_environment.agents.beta_agent import BetaAgent
 
 # config du jeu
 config = {"players": 2, "random_start_player": True}
