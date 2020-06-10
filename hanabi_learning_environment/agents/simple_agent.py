@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Simple Agent."""
+from pyatspi import state
 
 from hanabi_learning_environment.rl_env import Agent
 from hanabi_learning_environment.pyhanabi import HanabiCardKnowledge
@@ -28,7 +29,7 @@ class SimpleAgent(Agent):
 
     @staticmethod
     def my_possible_card(card_index, observation):
-        card = observation['observed_hands'][0][card_index]
+        print(observation['card_knowledge'][0])
 
     @staticmethod
     def playable_card(card, fireworks):
@@ -56,6 +57,7 @@ class SimpleAgent(Agent):
         """Act based on an observation."""
         # colors={'G','W','Y','B','R'}
         # ranks={1,2,3,4,5}
+        SimpleAgent.my_possible_card(0, observation)
 
         if observation['current_player_offset'] != 0:
             return None
