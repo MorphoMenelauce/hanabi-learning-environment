@@ -14,6 +14,7 @@
 """Simple Agent."""
 
 from hanabi_learning_environment.rl_env import Agent
+from hanabi_learning_environment.pyhanabi import HanabiCardKnowledge
 
 
 class SimpleAgent(Agent):
@@ -26,20 +27,24 @@ class SimpleAgent(Agent):
         self.max_information_tokens = config.get('information_tokens', 8)
 
     @staticmethod
+    def my_possible_card(card_index, observation):
+        card = observation['observed_hands'][0][card_index]
+
+    @staticmethod
     def playable_card(card, fireworks):
         """A card is playable if it can be placed on the fireworks pile."""
         return card['rank'] == fireworks[card['color']]
+
+    @staticmethod
+    def discardble_card(card, fireworks):
+        """A card is playable if it can be placed on the fireworks pile."""
+        return card['rank'] < fireworks[card['color']]
 
     @staticmethod
     def my_playable_card(card_index, observation, fireworks):
         """A card is playable if it can be placed on the fireworks pile."""
         return observation['card_knowledge'][0][card_index]['rank'] == fireworks[
             observation['card_knowledge'][0][card_index]['color']]
-
-    @staticmethod
-    def discardble_card(card, fireworks):
-        """A card is playable if it can be placed on the fireworks pile."""
-        return card['rank'] < fireworks[card['color']]
 
     @staticmethod
     def my_discardble_card(card_index, observation, fireworks):
@@ -63,10 +68,11 @@ class SimpleAgent(Agent):
                 if SimpleAgent.my_playable_card(card_index, observation, observation['fireworks']):
                     return {'action_type': 'PLAY', 'card_index': card_index}
 
-        for card_index in range(len(my_cards_list)):
-            if my_hints_list[card_index]['color'] is not None and my_hints_list[card_index]['rank'] is not None:
-                if SimpleAgent.my_discardble_card(card_index, observation, observation['fireworks']):
-                    return {'action_type': 'DISCARD', 'card_index': card_index}
+        if observation['information_tokens'] < self.max_information_tokens:
+            for card_index in range(len(my_cards_list)):
+                if my_hints_list[card_index]['color'] is not None and my_hints_list[card_index]['rank'] is not None:
+                    if SimpleAgent.my_discardble_card(card_index, observation, observation['fireworks']):
+                        return {'action_type': 'DISCARD', 'card_index': card_index}
         # Check if there are any pending hints and play the card corresponding to
         # the hint.
         # for card_index, hint in enumerate(observation['card_knowledge'][0]):
@@ -84,28 +90,42 @@ class SimpleAgent(Agent):
                 # Check if the card in the hand of the colleagues is playable.
                 for card, hint in zip(player_hand, player_hints):
                     if SimpleAgent.playable_card(card,
-                                                 fireworks) and hint['color'] is None:
+                                                 fireworks) and hint['color'] is None and hint['rank'] is not None:
                         return {
                             'action_type': 'REVEAL_COLOR',
                             'color': card['color'],
                             'target_offset': player_offset
                         }
                     if SimpleAgent.playable_card(card,
-                                                 fireworks) and hint['rank'] is None:
+                                                 fireworks) and hint['rank'] is None and hint['color'] is not None:
+                        return {
+                            'action_type': 'REVEAL_RANK',
+                            'rank': card['rank'],
+                            'target_offset': player_offset
+                        }
+                    if SimpleAgent.playable_card(card,
+                                                 fireworks) and hint['rank'] is None and hint['color'] is None:
                         return {
                             'action_type': 'REVEAL_RANK',
                             'rank': card['rank'],
                             'target_offset': player_offset
                         }
                     if SimpleAgent.discardble_card(card,
-                                                   fireworks) and hint['color'] is None:
+                                                   fireworks) and hint['color'] is None and hint['rank'] is not None:
                         return {
                             'action_type': 'REVEAL_COLOR',
                             'color': card['color'],
                             'target_offset': player_offset
                         }
                     if SimpleAgent.discardble_card(card,
-                                                   fireworks) and hint['rank'] is None:
+                                                   fireworks) and hint['rank'] is None and hint['color'] is not None:
+                        return {
+                            'action_type': 'REVEAL_RANK',
+                            'rank': card['rank'],
+                            'target_offset': player_offset
+                        }
+                    if SimpleAgent.discardble_card(card,
+                                                   fireworks) and hint['rank'] is None and hint['color'] is None:
                         return {
                             'action_type': 'REVEAL_RANK',
                             'rank': card['rank'],
