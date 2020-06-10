@@ -67,7 +67,7 @@ class Runner(object):
 
 
 if __name__ == "__main__":
-    flags = {'players': 2, 'num_episodes': 2, 'agent_class': 'SimpleAgent'}
+    flags = {'players': 2, 'num_episodes': 1, 'agent_class': 'BetaAgent'}
     options, arguments = getopt.getopt(sys.argv[1:], '',
                                        ['players=',
                                         'num_episodes=',

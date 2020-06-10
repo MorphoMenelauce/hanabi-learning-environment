@@ -108,6 +108,11 @@ class BetaAgent(Agent):
                 if BetaAgent.my_playable_card(card_index, observation, observation['fireworks']):
                     return {'action_type': 'PLAY', 'card_index': card_index}
 
+        if information_tokens > 5:
+            value, move = BetaAgent.most_valuable_reveal(observation)
+            if value >= 2:
+                return move
+
         if information_tokens > 0:
             for card, hint in zip(you_cards, you_hints):
                 if BetaAgent.discardble_card(card, fireworks):
@@ -124,6 +129,18 @@ class BetaAgent(Agent):
                             'target_offset': 1
                         }
 
+        if information_tokens > 3:
+            for card, hint in zip(you_cards, you_hints):
+                if BetaAgent.discardble_card(card,
+                                             fireworks) and hint['rank'] is None and hint['color'] is None:
+                    return {
+                        'action_type': 'REVEAL_RANK',
+                        'rank': card['rank'],
+                        'target_offset': 1
+                    }
+
+        if information_tokens > 0:
+            for card, hint in zip(you_cards, you_hints):
                 if BetaAgent.playable_card(card, fireworks):
                     if hint['color'] is None and hint['rank'] is not None:
                         return {
@@ -138,20 +155,9 @@ class BetaAgent(Agent):
                             'target_offset': 1
                         }
 
-        if information_tokens > 2:
-            value, move = BetaAgent.most_valuable_reveal(observation)
-            if value >= 2:
-                return move
-
-        if information_tokens > 2:
+        if information_tokens > 6:
             for card, hint in zip(you_cards, you_hints):
-                if BetaAgent.discardble_card(card,
-                                             fireworks) and hint['rank'] is None and hint['color'] is None:
-                    return {
-                        'action_type': 'REVEAL_RANK',
-                        'rank': card['rank'],
-                        'target_offset': 1
-                    }
+
                 if BetaAgent.playable_card(card,
                                            fireworks) and hint['rank'] is None and hint['color'] is None:
                     return {
@@ -159,6 +165,9 @@ class BetaAgent(Agent):
                         'rank': card['rank'],
                         'target_offset': 1
                     }
+        if information_tokens > 6:
+            value, move = BetaAgent.most_valuable_reveal(observation)
+            return move
 
         if information_tokens < self.max_information_tokens:
             for card_index, hint in enumerate(observation['card_knowledge'][0]):

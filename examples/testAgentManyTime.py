@@ -12,7 +12,7 @@ config = {"players": 2, "random_start_player": True}
 game = rl_env.HanabiEnv(config)
 
 #
-agents = [SimpleAgent(config), SimpleAgent(config)]
+agents = [BetaAgent(config), BetaAgent(config)]
 res = 0
 for i in range(0, 1000):
     # reset game
