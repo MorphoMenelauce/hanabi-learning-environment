@@ -42,6 +42,7 @@ class SimpleAgent(Agent):
                 if you_cards_list[card_index]['color'] == reveal and you_hints_list[card_index]['color'] is None:
                     reveal_value += 1
             if reveal_value > max_color_reveal_value:
+                max_color_reveal_value = reveal_value
                 most_valuable_color_reveal = reveal
 
         for reveal in possible_rank_reveal:
@@ -50,10 +51,11 @@ class SimpleAgent(Agent):
                 if you_cards_list[card_index]['rank'] == reveal and you_hints_list[card_index]['rank'] is None:
                     reveal_value += 1
             if reveal_value > max_rank_reveal_value:
+                max_rank_reveal_value = reveal_value
                 most_valuable_rank_reveal = reveal
 
         if max_color_reveal_value > max_rank_reveal_value:
-            print('############################################')
+
             return {'action_type': 'REVEAL_COLOR',
                     'color': most_valuable_color_reveal,
                     'target_offset': 1}
@@ -61,10 +63,6 @@ class SimpleAgent(Agent):
             return {'action_type': 'REVEAL_RANK',
                     'rank': most_valuable_rank_reveal,
                     'target_offset': 1}
-
-    @staticmethod
-    def my_possible_card(observation):
-        print(observation['card_knowledge'][0])
 
     @staticmethod
     def playable_card(card, fireworks):
@@ -102,13 +100,11 @@ class SimpleAgent(Agent):
             for card_index in range(len(my_cards_list)):
                 if my_hints_list[card_index]['color'] is not None and my_hints_list[card_index]['rank'] is not None:
                     if SimpleAgent.my_discardble_card(card_index, observation, observation['fireworks']):
-                        print('1\n')
                         return {'action_type': 'DISCARD', 'card_index': card_index}
 
         for card_index in range(len(my_cards_list)):
             if my_hints_list[card_index]['color'] is not None and my_hints_list[card_index]['rank'] is not None:
                 if SimpleAgent.my_playable_card(card_index, observation, observation['fireworks']):
-                    print('2\n')
                     return {'action_type': 'PLAY', 'card_index': card_index}
 
         # Check if it's possible to hint a card to your colleagues.
@@ -120,42 +116,35 @@ class SimpleAgent(Agent):
                 player_hints = observation['card_knowledge'][player_offset]
                 # Check if the card in the hand of the colleagues is playable.
                 for card, hint in zip(player_hand, player_hints):
-                    if SimpleAgent.discardble_card(card,
-                                                   fireworks) and hint['color'] is None and hint['rank'] is not None:
-                        print('3\n')
-                        return {
-                            'action_type': 'REVEAL_COLOR',
-                            'color': card['color'],
-                            'target_offset': player_offset
-                        }
-                    if SimpleAgent.discardble_card(card,
-                                                   fireworks) and hint['rank'] is None and hint['color'] is not None:
-                        print('4\n')
-                        return {
-                            'action_type': 'REVEAL_RANK',
-                            'rank': card['rank'],
-                            'target_offset': player_offset
-                        }
+                    if SimpleAgent.discardble_card(card, fireworks):
+                        if hint['color'] is None and hint['rank'] is not None:
+                            return {
+                                'action_type': 'REVEAL_COLOR',
+                                'color': card['color'],
+                                'target_offset': player_offset
+                            }
+                        if hint['rank'] is None and hint['color'] is not None:
+                            return {
+                                'action_type': 'REVEAL_RANK',
+                                'rank': card['rank'],
+                                'target_offset': player_offset
+                            }
 
-                    if SimpleAgent.playable_card(card,
-                                                 fireworks) and hint['color'] is None and hint['rank'] is not None:
-                        print('5\n')
-                        return {
-                            'action_type': 'REVEAL_COLOR',
-                            'color': card['color'],
-                            'target_offset': player_offset
-                        }
-                    if SimpleAgent.playable_card(card,
-                                                 fireworks) and hint['rank'] is None and hint['color'] is not None:
-                        print('6\n')
-                        return {
-                            'action_type': 'REVEAL_RANK',
-                            'rank': card['rank'],
-                            'target_offset': player_offset
-                        }
+                    if SimpleAgent.playable_card(card, fireworks):
+                        if hint['color'] is None and hint['rank'] is not None:
+                            return {
+                                'action_type': 'REVEAL_COLOR',
+                                'color': card['color'],
+                                'target_offset': player_offset
+                            }
+                        if hint['rank'] is None and hint['color'] is not None:
+                            return {
+                                'action_type': 'REVEAL_RANK',
+                                'rank': card['rank'],
+                                'target_offset': player_offset
+                            }
                     if SimpleAgent.discardble_card(card,
                                                    fireworks) and hint['rank'] is None and hint['color'] is None:
-                        print('7\n')
                         return {
                             'action_type': 'REVEAL_RANK',
                             'rank': card['rank'],
@@ -163,7 +152,6 @@ class SimpleAgent(Agent):
                         }
                     if SimpleAgent.playable_card(card,
                                                  fireworks) and hint['rank'] is None and hint['color'] is None:
-                        print('8\n')
                         return {
                             'action_type': 'REVEAL_RANK',
                             'rank': card['rank'],
@@ -171,8 +159,7 @@ class SimpleAgent(Agent):
                         }
 
         # If no card is hintable then discard or play.
-        if observation['information_tokens'] > 3:
-            print('9\n')
+        if observation['information_tokens'] > 5:
             return SimpleAgent.most_valuable_reveal(observation)
 
         else:
@@ -180,9 +167,7 @@ class SimpleAgent(Agent):
                 if hint['color'] is None and hint['rank'] is None:
                     move = {'action_type': 'DISCARD', 'card_index': card_index}
                     if move in observation['legal_moves']:
-                        print('9\n')
                         return move
 
         move = {'action_type': 'DISCARD', 'card_index': 0}
-        print('10\n')
         return move
