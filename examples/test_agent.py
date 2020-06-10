@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function
 
-import numpy as np
-from hanabi_learning_environment import pyhanabi
 from hanabi_learning_environment import rl_env
 from hanabi_learning_environment.agents.simple_agent import SimpleAgent
-from hanabi_learning_environment.agents.chenyang_agent import ChenyangAgent
 
 # config du jeu
 config = {"players": 2, "random_start_player": True}
