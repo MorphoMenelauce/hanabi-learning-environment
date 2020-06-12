@@ -12,7 +12,7 @@ config = {"players": 2, "random_start_player": True}
 game = rl_env.HanabiEnv(config)
 
 #
-agents = [BetaAgent(config), BetaAgent(config)]
+agents = [SimpleAgent(config), SimpleAgent(config)]
 
 print(""""starting the game""")
 

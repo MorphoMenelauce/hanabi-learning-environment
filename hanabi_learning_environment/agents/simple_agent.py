@@ -98,6 +98,11 @@ class SimpleAgent(Agent):
         you_cards = observation['observed_hands'][1]
         you_hints = observation['card_knowledge'][1]
 
+        for card_index in range(len(my_cards_list)):
+            if observation['deck_size'] == 40:
+                if my_hints_list[card_index]['rank'] == 0:
+                    return {'action_type': 'PLAY', 'card_index': card_index}
+
         if information_tokens < self.max_information_tokens:
             for card_index in range(len(my_cards_list)):
                 if my_hints_list[card_index]['color'] is not None and my_hints_list[card_index]['rank'] is not None:
@@ -109,12 +114,7 @@ class SimpleAgent(Agent):
                 if SimpleAgent.my_playable_card(card_index, observation, observation['fireworks']):
                     return {'action_type': 'PLAY', 'card_index': card_index}
 
-        # Check if it's possible to hint a card to your colleagues.
-
         if information_tokens > 0:
-            # Check if there are any playable cards in the hands of the colleagues.
-
-            # Check if the card in the hand of the colleagues is playable.
             for card, hint in zip(you_cards, you_hints):
                 if SimpleAgent.discardble_card(card, fireworks):
                     if hint['color'] is None and hint['rank'] is not None:
