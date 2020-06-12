@@ -99,8 +99,25 @@ class SimpleAgent(Agent):
         you_hints = observation['card_knowledge'][1]
 
         for card_index in range(len(my_cards_list)):
-            if observation['deck_size'] == 40:
+            if observation['fireworks']['R'] == observation['fireworks']['G'] == observation['fireworks']['B'] == \
+                    observation['fireworks']['Y'] == observation['fireworks']['W'] == 0:
                 if my_hints_list[card_index]['rank'] == 0:
+                    return {'action_type': 'PLAY', 'card_index': card_index}
+            if observation['fireworks']['R'] == observation['fireworks']['G'] == observation['fireworks']['B'] == \
+                    observation['fireworks']['Y'] == observation['fireworks']['W'] == 1:
+                if my_hints_list[card_index]['rank'] == 1:
+                    return {'action_type': 'PLAY', 'card_index': card_index}
+            if observation['fireworks']['R'] == observation['fireworks']['G'] == observation['fireworks']['B'] == \
+                    observation['fireworks']['Y'] == observation['fireworks']['W'] == 2:
+                if my_hints_list[card_index]['rank'] == 2:
+                    return {'action_type': 'PLAY', 'card_index': card_index}
+            if observation['fireworks']['R'] == observation['fireworks']['G'] == observation['fireworks']['B'] == \
+                    observation['fireworks']['Y'] == observation['fireworks']['W'] == 3:
+                if my_hints_list[card_index]['rank'] == 3:
+                    return {'action_type': 'PLAY', 'card_index': card_index}
+            if observation['fireworks']['R'] == observation['fireworks']['G'] == observation['fireworks']['B'] == \
+                    observation['fireworks']['Y'] == observation['fireworks']['W'] == 4:
+                if my_hints_list[card_index]['rank'] == 4:
                     return {'action_type': 'PLAY', 'card_index': card_index}
 
         if information_tokens < self.max_information_tokens:
